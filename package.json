@@ -1,0 +1,21 @@
+{
+  "name": "toguru-client-nodejs",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bent": "^1.1.0",
+    "big-integer": "^1.6.26",
+    "cookie": "^0.3.1",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "jest": "^22.1.4",
+    "supertest-as-promised": "^4.0.2"
+  }
+}
