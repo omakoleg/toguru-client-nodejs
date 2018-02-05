@@ -1,6 +1,6 @@
 {
   "name": "toguru-client",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,9 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "jest": "^22.1.4",
+    "lodash": "^4.17.5",
     "mem": "^3.0.0",
+    "qs": "^6.5.1",
     "supertest-as-promised": "^4.0.2"
   },
   "devDependencies": {

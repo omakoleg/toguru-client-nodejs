@@ -1,9 +1,13 @@
 const mem = require('mem');
 
-const isToggleEnabled = (toggleName, allToggles, userBucket) => {
+const isToggleEnabled = (toggleName, allToggles, userBucket, forcedToggles) => {
     if (userBucket <= 0 || userBucket > 100) {
         console.warn('User bucket must be between 1 and 100.');
         return false;
+    }
+
+    if (forcedToggles && toggleName in forcedToggles) {
+        return forcedToggles[toggleName];
     }
 
     const toggle = allToggles.find(t => t.id === toggleName);

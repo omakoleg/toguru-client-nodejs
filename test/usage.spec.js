@@ -24,6 +24,7 @@ describe('Toguru Client Usage', () => {
 
         expect(client.isToggleEnabled('toggle-on-for-everyone', 'bcffcca3-8fcd-4f50-bc4b-494f9c373185')).toBe(true);
         expect(client.isToggleEnabled('toggle-on-for-none', 'bcffcca3-8fcd-4f50-bc4b-494f9c373185')).toBe(false);
+        expect(client.isToggleEnabled('toggle-on-for-none', 'bcffcca3-8fcd-4f50-bc4b-494f9c373185', { 'toggle-on-for-none': true })).toBe(true);
         expect(client.toggleNamesForService('Service1')).toEqual(['toggle-on-for-everyone', 'toggle-for-service1']);
         expect(client.toggleNamesForService('Service23234')).toEqual([]);
     });

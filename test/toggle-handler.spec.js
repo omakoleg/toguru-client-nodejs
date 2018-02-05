@@ -38,6 +38,21 @@ describe('Toggle Handling', () => {
 
     });
 
+    it('Should consider forced toggles', () => {
+        const allToggles = [{
+            id: 't0',
+            rolloutPercentage: 0
+        }, {
+            id: 't3',
+            rolloutPercentage: 100
+        }];
+        
+        expect(toggleHandler.isToggleEnabled('t0', allToggles, 10, { t0: true })).toBe(true);
+        expect(toggleHandler.isToggleEnabled('t1', allToggles, 10, { t1: true })).toBe(true);
+        expect(toggleHandler.isToggleEnabled('t2', allToggles, 10, { t2: false })).toBe(false);
+        expect(toggleHandler.isToggleEnabled('t3', allToggles, 10, { t3: false })).toBe(false);
+    });
+
     it('Should retrieve toggles for a specific service', () => {
         const t1 = {
             id: 't1',

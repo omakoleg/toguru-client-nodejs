@@ -20,9 +20,9 @@ module.exports = ({ endpoint, refreshInterval = 60000 }) => {
 
     return {
         ready: () => ready,
-        isToggleEnabled: (toggleName, uuid) => {
+        isToggleEnabled: (toggleName, uuid, forcedToggles) => {
             const bucket = calculateBucket(uuid);
-            return toggleHandler.isToggleEnabled(toggleName, toggles, bucket);
+            return toggleHandler.isToggleEnabled(toggleName, toggles, bucket, forcedToggles);
         },
         toggles: () => {
             return toggles;
