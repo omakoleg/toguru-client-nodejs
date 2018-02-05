@@ -1,10 +1,10 @@
 {
-  "name": "toguru-client-nodejs",
+  "name": "toguru-client",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,10 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "jest": "^22.1.4",
+    "mem": "^3.0.0",
     "supertest-as-promised": "^4.0.2"
+  },
+  "devDependencies": {
+    "semantic-release": "^12.4.1"
   }
 }
