@@ -1,8 +1,23 @@
 const cookie = require('cookie');
 const Client = require('./client');
-const qs = require('qs');
 
+const qs = require('qs');
+const setCookieParser = require('set-cookie-parser');
 const { mapValues } = require('lodash');
+
+const getCookieValueFromResponseHeader = (res, cookieName) => {
+    if (!res || !res.getHeader) {
+        return null;
+    }
+    
+    const cookies = setCookieParser.parse(res.getHeader('set-cookie'));
+    const cookie = cookies.find(c => c.name === cookieName);
+    if (!cookie) {
+        return null;
+    }
+
+    return cookie.value;
+};
 
 module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => { 
     const client = Client({
@@ -15,7 +30,7 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => {
         await client.ready();
 
         const cookies = req.headers ? cookie.parse(req.headers.cookie) : {};
-        const uuid = cookies[cookieName];
+        const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
 
         const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))
 

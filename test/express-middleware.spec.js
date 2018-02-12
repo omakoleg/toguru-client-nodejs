@@ -125,6 +125,23 @@ describe('Middleware', () => {
 
         await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
         expect(fakeRequest.toguru.isToggleEnabled('t1')).toBe(false);
+    });
 
+    it('should get cookie value from response header if not set in request', async () => {
+        const cookieName = 'testuid';
+
+        const fakeRequest = {};
+        const fakeNext = jest.fn();
+        const fakeResponse = {
+            getHeader(name) {
+                if (name === 'set-cookie') {
+                    return `${cookieName}=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f; Max-Age=31536000; Path=/`;
+                }
+            }
+        };
+
+        await expressMiddleware({ cookieName })(fakeRequest, fakeResponse, fakeNext);
+        expect(fakeNext).toHaveBeenCalled();
+        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-half')).toBe(true);
     });
 });

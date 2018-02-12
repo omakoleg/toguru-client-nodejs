@@ -19,6 +19,7 @@
     "lodash": "^4.17.5",
     "mem": "^3.0.0",
     "qs": "^6.5.1",
+    "set-cookie-parser": "^2.0.0",
     "supertest-as-promised": "^4.0.2"
   },
   "devDependencies": {
