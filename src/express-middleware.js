@@ -27,22 +27,27 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => {
 
     return async (req, res, next) => {
 
-        await client.ready();
+        try {
+            await client.ready();
 
-        const cookies = req.headers ? cookie.parse(req.headers.cookie) : {};
-        const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
+            const cookies = req.headers ? cookie.parse(req.headers.cookie) : {};
+            const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
 
-        const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))
+            const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))
 
-        const forcedToggles = mapValues(forcedTogglesRaw, v => v === 'true');
-    
-        req.toguru = {
-            isToggleEnabled: (toggleName) => client.isToggleEnabled(toggleName, uuid, forcedToggles),
-            toggles: client.toggles,
-            togglesForService: service => client.togglesForService(service),
-            toggleNamesForService: service => client.toggleNamesForService(service)
-        };
-    
-        next();
+            const forcedToggles = mapValues(forcedTogglesRaw, v => v === 'true');
+        
+            req.toguru = {
+                isToggleEnabled: (toggleName) => client.isToggleEnabled(toggleName, uuid, forcedToggles),
+                toggles: client.toggles,
+                togglesForService: service => client.togglesForService(service),
+                toggleNamesForService: service => client.toggleNamesForService(service)
+            };
+        } catch(ex) {
+            console.warn('Error in Toguru Client:', ex);
+        }
+        finally {
+            next();
+        }
     };
 };
