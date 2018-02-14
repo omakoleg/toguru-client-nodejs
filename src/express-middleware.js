@@ -3,7 +3,7 @@ const Client = require('./client');
 
 const qs = require('qs');
 const setCookieParser = require('set-cookie-parser');
-const { mapValues } = require('lodash');
+const { get, mapValues } = require('lodash');
 
 const getCookieValueFromResponseHeader = (res, cookieName) => {
     if (!res || !res.getHeader) {
@@ -30,7 +30,9 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => {
         try {
             await client.ready();
 
-            const cookies = req.headers ? cookie.parse(req.headers.cookie) : {};
+            const cookiesRaw = get(req, 'headers.cookie', '');
+            const cookies = cookie.parse(cookiesRaw);
+
             const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
 
             const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))

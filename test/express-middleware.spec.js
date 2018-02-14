@@ -144,4 +144,13 @@ describe('Middleware', () => {
         expect(fakeNext).toHaveBeenCalled();
         expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-half')).toBe(true);
     });
+
+    it('there is no cookie header in request headers', async () => {
+        const fakeRequest = { headers: {  } };
+        const fakeNext = jest.fn();
+        const fakeResponse = {};
+
+        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, fakeResponse, fakeNext);
+        expect(fakeNext).toHaveBeenCalled();
+    });
 });
