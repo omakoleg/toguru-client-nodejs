@@ -1,156 +1,59 @@
 const express = require('express');
 const expressMiddleware = require('../src/express-middleware');
 
-const mockedToggles = [
-    { id: 'toggle-on-for-everyone', rolloutPercentage: 100, tags: { team: 'Team 1', service: 'Service' } },
-    { id: 'toggle-on-for-half', rolloutPercentage: 50, tags: { team: 'Team 1', service: 'Service' } },
-    { id: 'toggle-on-for-none', rolloutPercentage: 0, tags: { team: 'Team 1', service: 'Service' } },
-];
+const mockedTogglestate = require('./togglestate.fixture.json');
 
 jest.mock('bent', () => () => {
-    return jest.fn().mockImplementation(() => Promise.resolve(mockedToggles));
+    return jest.fn().mockImplementation(() => Promise.resolve(mockedTogglestate));
 });
 
-describe('Middleware', () => {
-    it('Defines toguru object on request', async () => {
+const sendRequest = async ({ uuid, culture, forcedToggles }) => {
+    const fakeRequest = {
+        headers: {
+            cookie: `uid=${uuid};culture=${culture}`
+        }
+    };
 
-        const fakeRequest = {};
-        const fakeNext = jest.fn();
+    const fakeNext = jest.fn();
 
-        await expressMiddleware({ })(fakeRequest, null, fakeNext);
+    await expressMiddleware({ cookieName: 'uid', cultureCookieName: 'culture' })(fakeRequest, null, fakeNext);
 
-        expect(fakeNext).toHaveBeenCalledTimes(1);
-        expect(fakeRequest.toguru).toBeDefined();
+    return fakeRequest;
+};
+
+const userInBucket22CultureDE = { culture: 'de-DE', uuid: '88248687-6dce-4759-a5c0-3945eedc2b48' }; // bucket: 22
+const userInBucketb76CultureDE = { culture: 'de-DE', uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317' }; // bucket: 76
+const userInBucket22CultureIT = { culture: 'it-IT', uuid: '88248687-6dce-4759-a5c0-3945eedc2b48' }; // bucket: 22
+const userInBucket76CultureIT = { culture: 'it-IT', uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317' }; // bucket: 76
+
+
+describe('Express middleware', () => {
+    it('userInBucket22CultureDE', async() => {
+        const req = await sendRequest(userInBucket22CultureDE);
+        expect(req.toguru).toBeDefined();
+        expect(req.toguru.isToggleEnabled('rolled-out-to-everyone')).toBe(true);
+        expect(req.toguru.isToggleEnabled('rolled-out-to-half-in-de-only')).toBe(true);
     });
 
-    it('Gets all toggles', async () => {
-
-        const fakeRequest = {};
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ })(fakeRequest, null, fakeNext);
-
-        expect(fakeNext).toHaveBeenCalledTimes(1);
-        expect(fakeRequest.toguru).toBeDefined();
-        expect(fakeRequest.toguru.toggles).toBeDefined();
-        expect(fakeRequest.toguru.isToggleEnabled).toBeDefined();
-        expect(fakeRequest.toguru.toggles()).toEqual(mockedToggles);
+    it('userInBucketb76CultureDE', async() => {
+        const req = await sendRequest(userInBucketb76CultureDE);
+        expect(req.toguru).toBeDefined();
+        expect(req.toguru.isToggleEnabled('rolled-out-to-noone')).toBe(false);
+        expect(req.toguru.isToggleEnabled('rolled-out-to-half-in-de-only')).toBe(false);
     });
 
-    it('Detects whether toggles are on or off', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b103f;' //  user bucket 92
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-everyone')).toBe(true);
-        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-none')).toBe(false);
-
+    it('togglesForService 1', async() => {
+        const req = await sendRequest(userInBucket22CultureDE);
+        expect(req.toguru.togglesForService('service2')).toEqual({ 'rolled-out-to-half-in-de-only': true, 'rolled-out-to-noone': false });
     });
 
-    it('Detects whether toggles are on or off based on user id', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b103f;' //  user bucket 92
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-half')).toBe(false);
+    it('togglesForService 2', async() => {
+        const req = await sendRequest(userInBucket22CultureIT);
+        expect(req.toguru.togglesForService('service2')).toEqual({ 'rolled-out-to-half-in-de-only': false, 'rolled-out-to-noone': false });
     });
-
-    it('Detects whether toggles are on or off based on user id', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f;' // user bucket 16
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-half')).toBe(true);
-    });
-
-    it('should handle toggles forced by query string', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f;' // user bucket 16
-            },
-            query: {
-                toguru: 't1=true&t2=false'
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('t1')).toBe(true);
-        expect(fakeRequest.toguru.isToggleEnabled('t2')).toBe(false);
-
-    });
-
-    it('should handle toggles forced by cookie', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f;toguru=t1%3Dtrue%26t2%3Dfalse' // user bucket 16
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('t1')).toBe(true);
-        expect(fakeRequest.toguru.isToggleEnabled('t2')).toBe(false);
-
-    });
-
-    it('should prioritize toggles forced by query string over by cookie', async () => {
-        const fakeRequest = {
-            headers: {
-                cookie: 'uid=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f;toguru=t1%3Dtrue' // user bucket 16
-            },
-            query: {
-                toguru: 't1=false'
-            }
-        };
-
-        const fakeNext = jest.fn();
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, null, fakeNext);
-        expect(fakeRequest.toguru.isToggleEnabled('t1')).toBe(false);
-    });
-
-    it('should get cookie value from response header if not set in request', async () => {
-        const cookieName = 'testuid';
-
-        const fakeRequest = {};
-        const fakeNext = jest.fn();
-        const fakeResponse = {
-            getHeader(name) {
-                if (name === 'set-cookie') {
-                    return `${cookieName}=b3dfdfa0-1f04-47de-9e73-bc3f0c7b143f; Max-Age=31536000; Path=/`;
-                }
-            }
-        };
-
-        await expressMiddleware({ cookieName })(fakeRequest, fakeResponse, fakeNext);
-        expect(fakeNext).toHaveBeenCalled();
-        expect(fakeRequest.toguru.isToggleEnabled('toggle-on-for-half')).toBe(true);
-    });
-
-    it('there is no cookie header in request headers', async () => {
-        const fakeRequest = { headers: {  } };
-        const fakeNext = jest.fn();
-        const fakeResponse = {};
-
-        await expressMiddleware({ cookieName: 'uid' })(fakeRequest, fakeResponse, fakeNext);
-        expect(fakeNext).toHaveBeenCalled();
+    
+    it('toggleStringForService', async() => {
+        const req = await sendRequest(userInBucket22CultureIT);
+        expect(req.toguru.toggleStringForService('service2')).toEqual('toguru=rolled-out-to-half-in-de-only%3Dfalse%26rolled-out-to-noone%3Dfalse');
     });
 });

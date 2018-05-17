@@ -19,7 +19,7 @@ const getCookieValueFromResponseHeader = (res, cookieName) => {
     return cookie.value;
 };
 
-module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => { 
+module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookieName }) => { 
     const client = Client({
         endpoint,
         refreshInterval
@@ -28,22 +28,25 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName }) => {
     return async (req, res, next) => {
 
         try {
-            await client.ready();
-
             const cookiesRaw = get(req, 'headers.cookie', '');
             const cookies = cookie.parse(cookiesRaw);
 
             const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
+            const culture = cookies[cultureCookieName] || getCookieValueFromResponseHeader(res, cultureCookieName);
 
             const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))
 
             const forcedToggles = mapValues(forcedTogglesRaw, v => v === 'true');
         
             req.toguru = {
-                isToggleEnabled: (toggleName) => client.isToggleEnabled(toggleName, uuid, forcedToggles),
-                toggles: client.toggles,
-                togglesForService: service => client.togglesForService(service),
-                toggleNamesForService: service => client.toggleNamesForService(service)
+                isToggleEnabled: (toggleName) => client.isToggleEnabled(toggleName, { uuid, culture, forcedToggles }),
+                togglesForService: service => client.togglesForService(service, { uuid, culture, forcedToggles }),
+                toggleNamesForService: service => client.toggleNamesForService(service),
+
+                toggleStringForService: service => {
+                    const toggles = client.togglesForService(service, { uuid, culture, forcedToggles });
+                    return `toguru=${encodeURIComponent(qs.stringify(toggles))}`;;
+                }
             };
         } catch(ex) {
             console.warn('Error in Toguru Client:', ex);

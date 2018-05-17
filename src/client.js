@@ -1,37 +1,33 @@
-const calculateBucket = require('./calculate-bucket');
-const toggleHandler = require('./toggle-handler');
-
-const getJson = require('bent')('json');
-
+const calculateBucket = require('./services/calculate-bucket');
+const fetchTogglestate = require('./services/fetch-togglestate');
+const isToggleEnabledForUser = require('./services/is-toggle-enabled');
+const findToggleListForService = require('./services/find-toggle-list-for-service');
 
 module.exports = ({ endpoint, refreshInterval = 60000 }) => {
-    let toggles = [];
+    let toggleState = {};
 
-    const reload = async () => {
-        toggles = await getJson(endpoint);
-    };
-
-    const initialize = async () => {
-        setInterval(reload, refreshInterval);
-        await reload();
-    };
-
-    const ready = initialize();
+    fetchTogglestate(endpoint).then(ts => toggleState = ts);
+    setInterval(() => {
+        fetchTogglestate(endpoint).then(ts => toggleState = ts);
+    }, refreshInterval);
 
     return {
-        ready: () => ready,
-        isToggleEnabled: (toggleName, uuid, forcedToggles) => {
-            const bucket = calculateBucket(uuid);
-            return toggleHandler.isToggleEnabled(toggleName, toggles, bucket, forcedToggles);
+        isToggleEnabled: (toggleName, { uuid, culture, forcedToggles }) => {
+            return isToggleEnabledForUser(toggleState, toggleName, { uuid, culture, forcedToggles });
         },
-        toggles: () => {
-            return toggles;
-        },
-        togglesForService: (service) => {
-            return toggleHandler.togglesForService(service, toggles);
-        },
+
         toggleNamesForService: service => {
-            return toggleHandler.togglesForService(service, toggles).map(t => t.id);
+            return findToggleListForService(toggleState, service);
+        },
+
+        togglesForService: (service, user) => {
+            const result = {};
+            const toggles = findToggleListForService(toggleState, service);
+            toggles.forEach(t => {
+                result[t] = isToggleEnabledForUser(toggleState, t, user);
+            });
+
+            return result;
         }
     };
 };
