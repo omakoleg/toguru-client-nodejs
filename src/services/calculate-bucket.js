@@ -1,7 +1,3 @@
-const bigint = require('big-integer');
-
-const bigi = require('bigi');
-
 const BN = require('bn.js');
 
 module.exports = (uuid) => {

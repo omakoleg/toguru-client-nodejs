@@ -49,6 +49,12 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookie
                 }
             };
         } catch(ex) {
+            req.toguru = {
+                isToggleEnabled: () => true,
+                togglesForService: () => [],
+                toggleNamesForService: () => [],
+                toggleStringForService: () => ''
+            };
             console.warn('Error in Toguru Client:', ex);
         }
         finally {

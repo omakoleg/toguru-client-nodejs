@@ -7,8 +7,8 @@ const userInBucket76CultureIT = { culture: 'it-IT', uuid: '721f87e2-cec9-4753-b3
 
 const mockedTogglestate = require('./togglestate.fixture.json');
 
-jest.mock('bent', () => () => {
-    return jest.fn().mockImplementation(() => Promise.resolve(mockedTogglestate));
+jest.mock('axios', () => {
+    return jest.fn().mockImplementation(() => Promise.resolve({ data: mockedTogglestate }));
 });
 
 

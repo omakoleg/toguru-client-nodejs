@@ -3,9 +3,10 @@ const expressMiddleware = require('../src/express-middleware');
 
 const mockedTogglestate = require('./togglestate.fixture.json');
 
-jest.mock('bent', () => () => {
-    return jest.fn().mockImplementation(() => Promise.resolve(mockedTogglestate));
+jest.mock('axios', () => {
+    return jest.fn().mockImplementation(() => Promise.resolve({ data: mockedTogglestate }));
 });
+
 
 const sendRequest = async ({ uuid, culture, forcedToggles }) => {
     const fakeRequest = {

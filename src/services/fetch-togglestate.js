@@ -1,6 +1,9 @@
-const bent = require('bent');
+const axios = require('axios');
 
-const getToggles = require('bent')('json', { Accept: 'application/vnd.toguru.v3+json' });
-
-module.exports = endpoint => getToggles(endpoint);
-
+module.exports = endpoint => axios({
+    url: endpoint,
+    headers: {
+        Accept: 'application/vnd.toguru.v3+json'
+    },
+    dataType: 'json'
+}).then(({ data }) => data);
