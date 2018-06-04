@@ -45,7 +45,7 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookie
 
                 toggleStringForService: service => {
                     const toggles = client.togglesForService(service, { uuid, culture, forcedToggles });
-                    return `toguru=${encodeURIComponent(qs.stringify(toggles))}`;;
+                    return `toguru=${encodeURIComponent(qs.stringify(toggles, { delimiter: '|' }))}`;;
                 }
             };
         } catch(ex) {

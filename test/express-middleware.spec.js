@@ -55,6 +55,6 @@ describe('Express middleware', () => {
     
     it('toggleStringForService', async() => {
         const req = await sendRequest(userInBucket22CultureIT);
-        expect(req.toguru.toggleStringForService('service2')).toEqual('toguru=rolled-out-to-half-in-de-only%3Dfalse%26rolled-out-to-noone%3Dfalse');
+        expect(req.toguru.toggleStringForService('service2')).toEqual('toguru=rolled-out-to-half-in-de-only%3Dfalse%7Crolled-out-to-noone%3Dfalse');
     });
 });
