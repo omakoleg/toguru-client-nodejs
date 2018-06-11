@@ -34,7 +34,7 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookie
             const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
             const culture = cookies[cultureCookieName] || getCookieValueFromResponseHeader(res, cultureCookieName);
 
-            const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || ''))
+            const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || '', { delimiter: '|' }));
 
             const forcedToggles = mapValues(forcedTogglesRaw, v => v === 'true');
         

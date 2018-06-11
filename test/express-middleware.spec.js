@@ -8,11 +8,12 @@ jest.mock('axios', () => {
 });
 
 
-const sendRequest = async ({ uuid, culture, forcedToggles }) => {
+const sendRequest = async ({ uuid, culture, query }) => {
     const fakeRequest = {
         headers: {
             cookie: `uid=${uuid};culture=${culture}`
-        }
+        },
+        query: query || {}
     };
 
     const fakeNext = jest.fn();
@@ -56,5 +57,12 @@ describe('Express middleware', () => {
     it('toggleStringForService', async() => {
         const req = await sendRequest(userInBucket22CultureIT);
         expect(req.toguru.toggleStringForService('service2')).toEqual('toguru=rolled-out-to-half-in-de-only%3Dfalse%7Crolled-out-to-noone%3Dfalse');
+    });
+
+    it('Forced toggles', async () => {
+        const req = await sendRequest({ ...userInBucketb76CultureDE, query: { toguru: 'rolled-out-to-noone=true|rolled-out-to-half-in-de-only=true' } });
+        expect(req.toguru).toBeDefined();
+        expect(req.toguru.isToggleEnabled('rolled-out-to-noone')).toBe(true);
+        expect(req.toguru.isToggleEnabled('rolled-out-to-half-in-de-only')).toBe(true);
     });
 });
