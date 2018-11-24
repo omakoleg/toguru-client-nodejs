@@ -1,5 +1,5 @@
 // https://raw.githubusercontent.com/machinomy/types-bn/master/index.d.ts
-declare module 'bn' {
+declare module 'bn.js' {
   /*
    * These types are based on [1] from @ukstv and [2] from @MicahZoltu.
    * If anything is wrong with these types, feel free to complain to @vsund.
@@ -15,7 +15,11 @@ declare module 'bn' {
     static min(left: BN, right: BN): BN;
     static max(left: BN, right: BN): BN;
 
-    constructor(number: number | string | number[] | Buffer | Uint8Array, base?: number | 'hex', endian?: Endianness);
+    constructor(
+      number: number | string | number[] | Buffer | Uint8Array,
+      base?: number | 'hex',
+      endian?: Endianness
+    );
 
     // Utilities
     clone(): BN;
@@ -25,7 +29,11 @@ declare module 'bn' {
     toNumber(): number;
     toJSON(): string;
     toArray(endian?: Endianness, length?: number): number[];
-    toArrayLike(constructor: Uint8ArrayConstructor, endian?: Endianness, length?: number): Uint8Array;
+    toArrayLike(
+      constructor: Uint8ArrayConstructor,
+      endian?: Endianness,
+      length?: number
+    ): Uint8Array;
     toBuffer(endian?: Endianness, length?: number): Buffer;
     bitLength(): number;
     zeroBits(): number;

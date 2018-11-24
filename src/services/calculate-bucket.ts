@@ -1,5 +1,4 @@
-// const BN = require('bn.js');
-import BN from 'bn';
+import BN from 'bn.js';
 
 export default (uuid: string) => {
   // This calculation is broken.

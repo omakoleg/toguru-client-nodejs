@@ -4,16 +4,44 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc .",
-    "dev": "tsc --watch .",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "test": "jest",
+    "test:coverage": "jest --coverage ",
     "format:check": "prettier --list-different '*/**/*.{js,ts,tsx,json,md,scss,graphql,css}' || (echo \"Problem with code format. Please do yarn run prettier:fix\" && exit 1)",
     "format:fix": "prettier --write '*/**/*.{js,ts,tsx,json,md,scss,graphql,css}' '*.{js,ts,tsx,json,md,scss,graphql,css}'"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ],
+    "coverageReporters": [
+      "cobertura",
+      "html",
+      "text",
+      "text-summary"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/jest": "^23.3.9",
     "axios": "^0.18.0",
     "bigi": "^1.4.2",
     "bn.js": "^4.11.8",
@@ -25,7 +53,8 @@
     "mem": "^3.0.0",
     "qs": "^6.5.1",
     "set-cookie-parser": "^2.0.0",
-    "supertest-as-promised": "^4.0.2"
+    "supertest-as-promised": "^4.0.2",
+    "ts-jest": "^23.10.5"
   },
   "devDependencies": {
     "@types/cookie": "^0.3.2",
