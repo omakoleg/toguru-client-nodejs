@@ -9,9 +9,9 @@ const getCookieValueFromResponseHeader = (res, cookieName) => {
     if (!res || !res.getHeader) {
         return null;
     }
-    
+
     const cookies = setCookieParser.parse(res.getHeader('set-cookie'));
-    const cookie = cookies.find(c => c.name === cookieName);
+    const cookie = cookies.find((c) => c.name === cookieName);
     if (!cookie) {
         return null;
     }
@@ -26,10 +26,10 @@ const getCookieValueFromResponseHeader = (res, cookieName) => {
  * @param cultureCookieName - name of the cookie containing the user culture value
  */
 
-module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookieName }) => { 
+module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookieName }) => {
     const client = Client({
         endpoint,
-        refreshInterval
+        refreshInterval,
     });
 
     return async (req, res, next) => {
@@ -40,30 +40,49 @@ module.exports = ({ endpoint, refreshInterval = 60000, cookieName, cultureCookie
             const uuid = cookies[cookieName] || getCookieValueFromResponseHeader(res, cookieName);
             const culture = cookies[cultureCookieName] || getCookieValueFromResponseHeader(res, cultureCookieName);
 
-            const forcedTogglesRaw = Object.assign({}, qs.parse(cookies.toguru), qs.parse((req.query && req.query.toguru) || '', { delimiter: '|' }));
+            const forcedTogglesRaw = Object.assign(
+                {},
+                qs.parse(cookies.toguru),
+                qs.parse((req.query && req.query.toguru) || '', {
+                    delimiter: '|',
+                }),
+            );
 
-            const forcedToggles = mapValues(forcedTogglesRaw, toggleValue => toggleValue === 'true');
+            const forcedToggles = mapValues(forcedTogglesRaw, (toggleValue) => toggleValue === 'true');
 
             req.toguru = {
-                isToggleEnabled: (toggleName) => client.isToggleEnabled(toggleName, { uuid, culture, forcedToggles }),
-                togglesForService: service => client.togglesForService(service, { uuid, culture, forcedToggles }),
-                toggleNamesForService: service => client.toggleNamesForService(service),
+                isToggleEnabled: (toggleName) =>
+                    client.isToggleEnabled(toggleName, {
+                        uuid,
+                        culture,
+                        forcedToggles,
+                    }),
+                togglesForService: (service) =>
+                    client.togglesForService(service, {
+                        uuid,
+                        culture,
+                        forcedToggles,
+                    }),
+                toggleNamesForService: (service) => client.toggleNamesForService(service),
 
-                toggleStringForService: service => {
-                    const toggles = client.togglesForService(service, { uuid, culture, forcedToggles });
+                toggleStringForService: (service) => {
+                    const toggles = client.togglesForService(service, {
+                        uuid,
+                        culture,
+                        forcedToggles,
+                    });
                     return `toguru=${encodeURIComponent(qs.stringify(toggles, { delimiter: '|' }))}`;
-                }
+                },
             };
-        } catch(ex) {
+        } catch (ex) {
             req.toguru = {
                 isToggleEnabled: () => true,
                 togglesForService: () => [],
                 toggleNamesForService: () => [],
-                toggleStringForService: () => ''
+                toggleStringForService: () => '',
             };
             console.warn('Error in Toguru Client:', ex);
-        }
-        finally {
+        } finally {
             next();
         }
     };

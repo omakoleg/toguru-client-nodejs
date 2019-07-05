@@ -9,18 +9,20 @@ module.exports = (togglestate, togglename, { uuid, culture, forcedToggles }) => 
 
     const toggles = get(togglestate, 'toggles', []);
     const toggle = toggles.find(({ id }) => id === togglename);
-    
+
     const rolloutCultures = get(toggle, 'activations.0.attributes.culture', []);
     if (rolloutCultures.length > 0 && !rolloutCultures.includes(culture)) {
         return false;
     }
 
     const rolloutPercentage = get(toggle, 'activations.0.rollout.percentage', 0);
-    if(rolloutPercentage === 100) { return true; }
+    if (rolloutPercentage === 100) {
+        return true;
+    }
 
     if (uuid) {
         const bucket = calculateBucket(uuid);
-        return rolloutPercentage >= bucket
+        return rolloutPercentage >= bucket;
     }
 
     return false;

@@ -1,10 +1,22 @@
 const isEnabled = require('../src/services/is-toggle-enabled');
 const toggleState = require('./togglestate.fixture.json');
 
-const userInBucket22CultureDE = { culture: 'de-DE', uuid: '88248687-6dce-4759-a5c0-3945eedc2b48' }; // bucket: 22
-const userInBucket76CultureDE = { culture: 'de-DE', uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317' }; // bucket: 76
-const userInBucket22CultureIT = { culture: 'it-IT', uuid: '88248687-6dce-4759-a5c0-3945eedc2b48' }; // bucket: 22
-const userInBucket76CultureIT = { culture: 'it-IT', uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317' }; // bucket: 76
+const userInBucket22CultureDE = {
+    culture: 'de-DE',
+    uuid: '88248687-6dce-4759-a5c0-3945eedc2b48',
+}; // bucket: 22
+const userInBucket76CultureDE = {
+    culture: 'de-DE',
+    uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317',
+}; // bucket: 76
+const userInBucket22CultureIT = {
+    culture: 'it-IT',
+    uuid: '88248687-6dce-4759-a5c0-3945eedc2b48',
+}; // bucket: 22
+const userInBucket76CultureIT = {
+    culture: 'it-IT',
+    uuid: '721f87e2-cec9-4753-b3bb-d2ebe20dd317',
+}; // bucket: 76
 const userWithoutUUID = { culture: 'de-DE' }; // bucket: 1
 const userEmpty = {};
 
@@ -85,11 +97,36 @@ describe('Is Toggle Enabled', () => {
     it('forced toggles', () => {
         const forcedToggles = { 'rolled-out-to-noone': true };
 
-        expect(isEnabled(toggleState, 'rolled-out-to-noone', { ...userInBucket22CultureDE, forcedToggles })).toBe(true);
-        expect(isEnabled(toggleState, 'rolled-out-to-noone', { ...userInBucket76CultureDE, forcedToggles })).toBe(true);
-        expect(isEnabled(toggleState, 'rolled-out-to-noone', { ...userInBucket22CultureIT, forcedToggles })).toBe(true);
-        expect(isEnabled(toggleState, 'rolled-out-to-noone', { ...userInBucket76CultureIT, forcedToggles })).toBe(true);
-        expect(isEnabled(toggleState, 'rolled-out-to-noone', { ...userWithoutUUID, forcedToggles })).toBe(true);
+        expect(
+            isEnabled(toggleState, 'rolled-out-to-noone', {
+                ...userInBucket22CultureDE,
+                forcedToggles,
+            }),
+        ).toBe(true);
+        expect(
+            isEnabled(toggleState, 'rolled-out-to-noone', {
+                ...userInBucket76CultureDE,
+                forcedToggles,
+            }),
+        ).toBe(true);
+        expect(
+            isEnabled(toggleState, 'rolled-out-to-noone', {
+                ...userInBucket22CultureIT,
+                forcedToggles,
+            }),
+        ).toBe(true);
+        expect(
+            isEnabled(toggleState, 'rolled-out-to-noone', {
+                ...userInBucket76CultureIT,
+                forcedToggles,
+            }),
+        ).toBe(true);
+        expect(
+            isEnabled(toggleState, 'rolled-out-to-noone', {
+                ...userWithoutUUID,
+                forcedToggles,
+            }),
+        ).toBe(true);
         expect(isEnabled(toggleState, 'rolled-out-to-noone', { forcedToggles })).toBe(true);
     });
 });
