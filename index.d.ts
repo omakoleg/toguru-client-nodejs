@@ -2,9 +2,6 @@
 // Project: Scout24/toguru-client-nodejs
 // Definitions by: Scout24 https://github.com/Scout24
 
-
-// export as namespace toguruClientNodejs;
-
 declare function ToguruClient(toguruClientParams: ToguruClient.ToguruClientParams): ToguruClient.ToguruClientInstance;
 
 declare namespace ToguruClient {
